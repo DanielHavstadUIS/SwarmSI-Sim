@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import calcGiniCoefficient as cgc
 
 
-con = sqlite3.connect(findDBPath("bucketSumStake.db"))
+con = sqlite3.connect(findDBPath("nss.db"))
 
 # lets get gini coefficinet of 16 nodes static network 
 # (runID 1 for me) for 2000 rounds
 
-RUNID=2
+RUNID=1
 # How many rounds to calculate gini for
 giniRoundLimit = 2500000
 
@@ -19,7 +19,7 @@ q = "SELECT runDesc FROM run WHERE runID=?"
 cur = con.cursor()
 r = cur.execute(q, (RUNID,))
 description = r.fetchone()[0]
-
+print(description)
 
 q="""
 SELECT min(roundID) as minR,

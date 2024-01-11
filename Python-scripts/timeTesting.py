@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import calcGiniCoefficient as cgc
 
 
-con = sqlite3.connect(findDBPath("simRes.db"))
+con = sqlite3.connect(findDBPath("maliciousTest.db"))
 
 # lets get gini coefficinet of 16 nodes static network 
 # (runID 1 for me) for 2000 rounds
@@ -13,10 +13,14 @@ con = sqlite3.connect(findDBPath("simRes.db"))
 startRound = 350667
 endRound = 358667
 
+startRound = 1
+endRound = 100
+
 gini1 = []
 
 start = time.time()
 for i in range(startRound, endRound):
+    print(i)
     tmp = cgc.getRoundStats(con, 0, i)
     gini1.append(cgc.calcGini(tmp))
 end = time.time()

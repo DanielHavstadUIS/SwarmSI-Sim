@@ -118,10 +118,10 @@ if __name__ == "__main__":
     print(calcGiniList(x))
 
     # some roundID
-    rid = 123
+    rid = 2
 
     #sql connection:
-    con = sqlite3.connect(findDBPath("simRes.db"))
+    con = sqlite3.connect(findDBPath("nss.db"))
     
     asd = getRoundStats(con, 0, rid)
 

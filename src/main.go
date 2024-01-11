@@ -6,12 +6,14 @@ import (
 )
 
 // TODO: Consider moving constants to their own file.
-const NODECOUNT = 32896
+
+// const NODECOUNT = 32896
+const NODECOUNT = 2048
 const ADDRESSLENGTH = 128
 
 // with 15 minutes pr round, 350666 rounds is approx 10 years
-const ROUNDS = 350000
-const DBNAME = "nss.db"
+const ROUNDS = 100
+const DBNAME = "maliciousTest.db"
 const DESCRIPTION = "" +
 	"Depth 16 - 128 add - 20 runs - Shifting node placement - Stake:50k"
 
@@ -28,7 +30,7 @@ func main() {
 	saver := saveFullStateSql{
 		everyXRound: new(int),
 	}
-	*saver.everyXRound = 10000
+	*saver.everyXRound = 1
 
 	saver.init()
 
@@ -36,21 +38,21 @@ func main() {
 	// 	amount: 10,
 	// }
 
-	// stake := PowerDistStake{
-	// 	alpha:      2.5,
-	// 	minStake:   10,
-	// 	rounding:   true,
-	// 	roundBy:    10,
-	// 	limitStake: false,
-	// }
-
-	stake := spreadStake{
-		stake:    50000,
-		nc:       new(int),
-		operator: new(int),
+	stake := PowerDistStake{
+		alpha:      2.5,
+		minStake:   10,
+		rounding:   true,
+		roundBy:    10,
+		limitStake: false,
 	}
-	*stake.operator = 1
-	*stake.nc = 0
+
+	// stake := spreadStake{
+	// 	stake:    50000,
+	// 	nc:       new(int),
+	// 	operator: new(int),
+	// }
+	// *stake.operator = 1
+	// *stake.nc = 0
 
 	//
 	// NETWORKS
@@ -72,7 +74,21 @@ func main() {
 	// 	nodes:             make([]*node, 0, NODECOUNT),
 	// }
 
-	swnet := &KademSwarmTreeStorageDepth{
+	// swnet := &KademSwarmTreeStorageDepth{
+	// 	addressLength:     ADDRESSLENGTH,
+	// 	nodeCount:         NODECOUNT,
+	// 	stakeDistribution: stake,
+	// 	kademTree:         bintree{root: &binNode{prefix: ""}},
+	// 	fullySaturate:     false,
+	// 	storageDepth:      8,
+	// 	addressBook:       make(map[uint64]*node),
+	// 	kademAddress:      make(map[string]*node),
+	// 	nodes:             make([]*node, 0, NODECOUNT),
+	// }
+
+	//shoehorn in new malicious network
+
+	swnet := &KademSwarmTreeStorageDepthMalicious{
 		addressLength:     ADDRESSLENGTH,
 		nodeCount:         NODECOUNT,
 		stakeDistribution: stake,
@@ -82,6 +98,8 @@ func main() {
 		addressBook:       make(map[uint64]*node),
 		kademAddress:      make(map[string]*node),
 		nodes:             make([]*node, 0, NODECOUNT),
+		revealMap:         make(map[*node]int),
+		frozenMap:         map[*node]bool{},
 	}
 
 	//
