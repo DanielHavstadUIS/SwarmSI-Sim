@@ -13,7 +13,7 @@ const ADDRESSLENGTH = 128
 
 // with 15 minutes pr round, 350666 rounds is approx 10 years
 const ROUNDS = 100
-const DBNAME = "maliciousTest.db"
+const DBNAME = "nss.db"
 const DESCRIPTION = "" +
 	"Depth 16 - 128 add - 20 runs - Shifting node placement - Stake:50k"
 
@@ -34,17 +34,17 @@ func main() {
 
 	saver.init()
 
-	// stake := EqualStake{
-	// 	amount: 10,
-	// }
-
-	stake := PowerDistStake{
-		alpha:      2.5,
-		minStake:   10,
-		rounding:   true,
-		roundBy:    10,
-		limitStake: false,
+	stake := EqualStake{
+		amount: 10,
 	}
+
+	// stake := PowerDistStake{
+	// 	alpha:      2.5,
+	// 	minStake:   10,
+	// 	rounding:   true,
+	// 	roundBy:    10,
+	// 	limitStake: false,
+	// }
 
 	// stake := spreadStake{
 	// 	stake:    50000,
@@ -62,6 +62,13 @@ func main() {
 	// 	networkNodeCount:  NODECOUNT,
 	// 	stakeDistribution: stake,
 	// }
+
+	swnet := &FixedIdealSwarmNetworkMalicious{
+		networkNodeCount:  NODECOUNT,
+		stakeDistribution: stake,
+		revealMap:         make(map[*node]int),
+		frozenMap:         map[*node]*FrozenStatus{},
+	}
 
 	// swnet := &KademSwarmTree{
 	// 	addressLength:     ADDRESSLENGTH,
@@ -88,19 +95,19 @@ func main() {
 
 	//shoehorn in new malicious network
 
-	swnet := &KademSwarmTreeStorageDepthMalicious{
-		addressLength:     ADDRESSLENGTH,
-		nodeCount:         NODECOUNT,
-		stakeDistribution: stake,
-		kademTree:         bintree{root: &binNode{prefix: ""}},
-		fullySaturate:     false,
-		storageDepth:      8,
-		addressBook:       make(map[uint64]*node),
-		kademAddress:      make(map[string]*node),
-		nodes:             make([]*node, 0, NODECOUNT),
-		revealMap:         make(map[*node]int),
-		frozenMap:         map[*node]bool{},
-	}
+	// swnet := &KademSwarmTreeStorageDepthMalicious{
+	// 	addressLength:     ADDRESSLENGTH,
+	// 	nodeCount:         NODECOUNT,
+	// 	stakeDistribution: stake,
+	// 	kademTree:         bintree{root: &binNode{prefix: ""}},
+	// 	fullySaturate:     false,
+	// 	storageDepth:      8,
+	// 	addressBook:       make(map[uint64]*node),
+	// 	kademAddress:      make(map[string]*node),
+	// 	nodes:             make([]*node, 0, NODECOUNT),
+	// 	revealMap:         make(map[*node]int),
+	// 	frozenMap:         map[*node]bool{},
+	// }
 
 	//
 	// SIMULATOR
