@@ -8,12 +8,12 @@ import (
 // TODO: Consider moving constants to their own file.
 
 // const NODECOUNT = 32896
-const NODECOUNT = 2048
+const NODECOUNT = 1024
 const ADDRESSLENGTH = 128
 
 // with 15 minutes pr round, 350666 rounds is approx 10 years
-const ROUNDS = 100
-const DBNAME = "nss.db"
+const ROUNDS = 10000
+const DBNAME = "malicious.db"
 const DESCRIPTION = "" +
 	"Depth 16 - 128 add - 20 runs - Shifting node placement - Stake:50k"
 
@@ -66,8 +66,8 @@ func main() {
 	swnet := &FixedIdealSwarmNetworkMalicious{
 		networkNodeCount:  NODECOUNT,
 		stakeDistribution: stake,
-		revealMap:         make(map[*node]int),
-		frozenMap:         map[*node]*FrozenStatus{},
+		revealMap:         make(map[uint64]int),
+		frozenMap:         map[uint64]*FrozenStatus{},
 	}
 
 	// swnet := &KademSwarmTree{

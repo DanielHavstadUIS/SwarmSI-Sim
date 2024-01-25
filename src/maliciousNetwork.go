@@ -32,10 +32,10 @@ type FixedIdealSwarmNetworkMalicious struct {
 	stakeDistribution StakeCreator
 
 	// gonna go with an initial scheme where 1 is a correct proof, and any other number is a unique malicious reveal
-	revealMap map[*node]int
+	revealMap map[uint64]int
 	// need to later do some logic so a node can be unfrozen
 	// might need slashable stake
-	frozenMap map[*node]*FrozenStatus
+	frozenMap map[uint64]*FrozenStatus
 }
 
 func (sn *FixedIdealSwarmNetworkMalicious) CreateSwarmNetwork() {
@@ -75,8 +75,8 @@ func (sn *FixedIdealSwarmNetworkMalicious) CreateSwarmNetwork() {
 		}
 		// Initially set malicious attributes to default
 		fmt.Println(&nn)
-		sn.revealMap[&nn] = 0
-		sn.frozenMap[&nn] = &FrozenStatus{false, 0}
+		sn.revealMap[nn.Id] = 0
+		sn.frozenMap[nn.Id] = &FrozenStatus{false, 0}
 	}
 }
 
@@ -91,7 +91,7 @@ func (sn *FixedIdealSwarmNetworkMalicious) selectUnfrozenNodes(nbhood *neighbour
 	// find eligible unfrozen nodes
 	unfrozenNodes := make([]*node, 0)
 	for i := 0; i < nbhood.nodeCount; i++ {
-		if sn.frozenMap[nbhood.nodes[i]].isFrozen == false {
+		if sn.frozenMap[nbhood.nodes[i].Id].isFrozen == false {
 			unfrozenNodes = append(unfrozenNodes, nbhood.nodes[i])
 		}
 	}
@@ -100,7 +100,7 @@ func (sn *FixedIdealSwarmNetworkMalicious) selectUnfrozenNodes(nbhood *neighbour
 
 func (sn *FixedIdealSwarmNetworkMalicious) unfreezeNodes() {
 	for i := 0; i < len(sn.nodes); i++ {
-		currentStatus := sn.frozenMap[sn.nodes[i]]
+		currentStatus := sn.frozenMap[sn.nodes[i].Id]
 
 		if currentStatus.isFrozen == true {
 			currentStatus.duration = currentStatus.duration - 1
@@ -112,7 +112,7 @@ func (sn *FixedIdealSwarmNetworkMalicious) unfreezeNodes() {
 }
 
 func (sn *FixedIdealSwarmNetworkMalicious) freezeDeposit(node *node, duration int) {
-	currentStatus := sn.frozenMap[node]
+	currentStatus := sn.frozenMap[node.Id]
 	currentStatus.isFrozen = true
 	currentStatus.duration = duration
 
@@ -120,17 +120,23 @@ func (sn *FixedIdealSwarmNetworkMalicious) freezeDeposit(node *node, duration in
 
 func (sn *FixedIdealSwarmNetworkMalicious) SelectWinner() *node {
 	nbhood := sn.SelectNeighbourhood()
+	fmt.Println("neighbourhoodcount")
 	fmt.Println(nbhood.nodeCount)
+	fmt.Println("neighbourhoodIDs")
+	for i := 0; i < nbhood.nodeCount; i++ {
+		fmt.Println(nbhood.nodes[i].Id)
+	}
+
 	sn.unfreezeNodes()
 	//init reveals
 	//select one neighbourhood node to be malicous
 	for i := 0; i < nbhood.nodeCount; i++ {
 		//if not already initialized
-		if sn.revealMap[nbhood.nodes[i]] == 0 {
+		if sn.revealMap[nbhood.nodes[i].Id] == 0 {
 			if i == 0 {
-				sn.revealMap[nbhood.nodes[0]] = 2
+				sn.revealMap[nbhood.nodes[0].Id] = 2
 			} else {
-				sn.revealMap[nbhood.nodes[i]] = 1
+				sn.revealMap[nbhood.nodes[i].Id] = 1
 
 			}
 		}
@@ -143,20 +149,20 @@ func (sn *FixedIdealSwarmNetworkMalicious) SelectWinner() *node {
 	//fmt.Println(len(unfrozenNodes))
 	truthCursor := rand.Intn(len(unfrozenNodes))
 	//fmt.Println(truthCursor)
-	truth := sn.revealMap[unfrozenNodes[truthCursor]]
+	truth := sn.revealMap[unfrozenNodes[truthCursor].Id]
 
 	//freeze those not following truth
 
 	for i := 0; i < len(unfrozenNodes); i++ {
-		if sn.revealMap[unfrozenNodes[i]] != truth {
-			sn.freezeDeposit(unfrozenNodes[i], nbhood.nodeCount)
+		if sn.revealMap[unfrozenNodes[i].Id] != truth {
+			sn.freezeDeposit(unfrozenNodes[i], len(sn.neighbourhoods))
 		}
 	}
 
 	// find eligible unfrozen nodes again
 	unfrozenNodes = sn.selectUnfrozenNodes(nbhood)
 
-	fmt.Println(len(unfrozenNodes))
+	//fmt.Println(len(unfrozenNodes))
 
 	// It's weigthed by the stake of the nodes.
 	weigthSum := 0
@@ -182,6 +188,7 @@ func (sn *FixedIdealSwarmNetworkMalicious) SelectWinner() *node {
 }
 func (sn *FixedIdealSwarmNetworkMalicious) UpdateNetwork() {
 	// Fixed network, no change
+	fmt.Println(sn.revealMap)
 }
 
 // Creates an array of nodes at their current state.
